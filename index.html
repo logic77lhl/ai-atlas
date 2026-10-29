@@ -119,6 +119,42 @@ footer button{background:none;border:1px solid var(--line);color:var(--dim);bord
 footer button:hover{color:var(--txt);border-color:var(--dim2)}
 footer .note{flex:1 1 320px;line-height:1.6}
 
+/* ── 视图切换 ── */
+.modes{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:0 0 auto}
+.modes button{background:transparent;border:0;color:var(--dim);padding:8px 15px;font-size:12.5px;
+  line-height:1.4;white-space:nowrap}
+.modes button:hover{color:var(--txt)}
+.modes button.on{background:rgba(255,210,30,.13);color:var(--acc)}
+
+/* ── 史书（时间轴） ── */
+.tlead{max-width:780px;margin:0 0 24px}
+.tlead p{margin:0 0 7px;font-size:12.5px;color:var(--dim);line-height:1.7}
+.tlead b{color:var(--txt);font-weight:600}
+.tlead .fine{color:var(--dim2);font-size:11.5px}
+.era{margin:0 0 30px}
+.erahd{display:flex;align-items:baseline;gap:9px;margin:0 0 3px}
+.eryr{font:12px var(--mono);color:var(--acc);letter-spacing:.6px}
+.ercnt{font:10.5px var(--mono);color:var(--dim2)}
+.era h3{margin:0 0 5px;font-size:14.5px;font-weight:600;letter-spacing:.2px}
+.era .erp{margin:0 0 13px;font-size:12px;color:var(--dim);line-height:1.7;max-width:760px}
+.yrow{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.yrow .yr{font:11.5px var(--mono);color:var(--dim2);flex:0 0 46px;padding-top:5px;letter-spacing:.3px}
+.yitems{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.yitem{display:inline-flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--txt);
+  font-size:12.5px;line-height:1.5;text-align:left}
+.yitem:hover{border-color:#33445c}
+.yitem .ys{font:9.5px/1.5 var(--mono);color:var(--dim2);border:1px solid var(--line);
+  border-radius:4px;padding:0 4px;flex:0 0 auto}
+.yitem .ym{font:9.5px var(--mono);color:var(--green);flex:0 0 auto}
+.yitem.done{border-color:rgba(52,211,153,.32)}
+.yitem.est .nm::after{content:"~";color:var(--dim2);font-size:9.5px;margin-left:1px}
+.card .yr{font:9.5px var(--mono);color:var(--dim2)}
+.tend{margin:26px 0 0;padding:13px 15px;border:1px dashed var(--line);border-radius:10px;
+  font-size:12px;color:var(--dim2);line-height:1.7;max-width:760px}
+.tend b{color:var(--dim)}
+body[data-mode="time"] .dagwrap{display:none}
+
 /* ── 依赖图 ── */
 .dagwrap{max-width:1180px;margin:0 auto;padding:16px 20px 0}
 .daghead{display:flex;align-items:center;gap:10px;margin:0 0 9px}
@@ -192,6 +228,10 @@ footer #btnSync.err{color:var(--red);border-color:rgba(251,113,133,.45)}
     <div class="stat" id="stat">0 / 0</div>
   </div>
   <div class="tools">
+    <div class="modes" id="modes">
+      <button data-mode="map" class="on" title="按领域分层，看谁依赖谁">地图</button>
+      <button data-mode="time" title="按年份编年，看谁先来">史书</button>
+    </div>
     <input id="q" type="search" placeholder="搜索概念、术语…（按 / 聚焦）" autocomplete="off">
     <div class="chips" id="statusChips"></div>
   </div>
@@ -594,17 +634,61 @@ const DATA = [
   l:[["WIPO：前沿技术知识产权","https://www.wipo.int/en/web/frontier-technologies"],["论文：Foundation Models and Fair Use","https://arxiv.org/abs/2303.15715"]] }
 ];
 
+/* ═══════════════ 年份 ═══════════════ */
+
+/* 每条概念「成形」的时间：首次公开发表，或首次成为通用做法。
+   带 ~ 的是估计——工程实践类没有单一论文可依，只能定到年。 */
+const YEAR = {
+  backprop:"1986-10", adamw:"2017-11", amp:"2017-10", bandwidth:"2022-05",
+  scaling:"2020-01", distributed:"2019-10", checkpointing:"2016-04",
+  rnn:"1997-11", transformer:"2017-06", attention:"2019-11", rope:"2021-04",
+  tokenizer:"2015-08", word2vec:"2013-01", moe:"1991", multimodal:"2021-03",
+  pretrain:"2018-06", sft:"2022-03", rlhf:"2017-06", dpo:"2023-05",
+  grpo:"2024-02", lora:"2021-06", qlora:"2023-05", data:"~2021", distill:"2015-03",
+  kvcache:"~2019", paged:"2023-09", staticbatch:"~2017", batching:"2022",
+  quant:"2022-10", spec:"2022-11", prefix:"2023-11", engines:"~2023",
+  embedding:"2019-08", vectorindex:"2016-03", chunking:"~2023", rerank:"2020-04",
+  rag:"2020-05", rageval:"~2023",
+  react:"2022-10", tooluse:"2023-07", mcp:"2024-11", memory:"~2023",
+  planning:"2022-01", multiagent:"~2023", computeruse:"2024-04",
+  benchmark:"2020-09", judge:"2023-06", arena:"2024-03", regression:"~2022",
+  contamination:"2023-11",
+  promptops:"~2023", observability:"~2023", cost:"2024-06", injection:"2023-02", deploy:"~2023",
+  alignment:"2022-03", licensing:"2024-10", privacy:"~2020", copyright:"2023-03"
+};
+DATA.forEach(x => { x.y = YEAR[x.id] || ""; });
+
+/* 时间轴的分段。不是十年一段，而是按「这段时间在解决同一个问题」切。 */
+const ERAS = [
+  { a:1986, b:1997, t:"想法先到，条件没到",
+    p:"三个想法都在这十一年里提出：反向传播、混合专家、LSTM。它们没有被推翻，只是当时没有足够的数据和算力兑现。混合专家甚至等了三十年才进入主流。" },
+  { a:2013, b:2016, t:"先补表示与管道",
+    p:"词向量让词语有了坐标，子词分词让模型不再被生词卡死；梯度检查点和向量索引是后面能跑大模型、能做检索的前置件。这几年不显眼，但都留到了今天。" },
+  { a:2017, b:2019, t:"架构定型",
+    p:"Transformer 一出，配套件两年内到齐：位置编码、优化器、混合精度、人类反馈、预训练范式、分布式切分。今天的主流架构基本没有再变过。" },
+  { a:2020, b:2021, t:"用规模换能力",
+    p:"缩放定律给了「继续加参数」的理由。同一时期出现三件缓解手段：低秩适配压微调成本、检索补知识、重排提命中率。" },
+  { a:2022, b:2022, t:"从演示到产品",
+    p:"九个概念落在这一年，主线只有一个：让模型能上线。指令微调、思维链、工具调用解决「怎么用」，量化、投机解码、连续批处理解决「太贵太慢」。" },
+  { a:2023, b:2023, t:"工程层一次补齐",
+    p:"十七个概念落在一年，占全表近三成。没有一个是新理论，全是在把模型变成能跑、能测、能控的系统：分页注意力、前缀缓存、DPO、QLoRA、Agent 记忆、模型评判、可观测性。" },
+  { a:2024, b:2024, t:"边界显形",
+    p:"能力上来之后，问题变具体了：开源到底怎么定义、输出算不算侵权、成本能不能接受、模型之间怎么接。这是目前表里最后一年有新条目。" }
+];
+
 /* ═══════════════ 状态 ═══════════════ */
 
 const KEY = "ai-atlas-v1";
 const SKEY = "ai-atlas-sync";
 const MARKS = { want:{ n:"想学", c:"var(--blue)" }, seen:{ n:"看懂", c:"var(--amber)" }, learned:{ n:"已掌握", c:"var(--green)" } };
 
-let view = { q:"", status:"all", domain:"all", onlyTodo:false };
+let view = { q:"", status:"all", domain:"all", onlyTodo:false, mode:"map" };
 let marks = {};          // id -> want | seen | learned
 let mts = {};            // id -> 修改时间戳，用于跨设备合并
 const CFG = { token:"", gistId:"", device:"", lastAt:0 };
 let syncBusy = false;
+
+try { const m = localStorage.getItem("ai-atlas-mode"); if (m === "time" || m === "map") view.mode = m; } catch (e) {}
 
 try {
   const raw = localStorage.getItem(KEY);
@@ -701,7 +785,9 @@ function toggleDag(force) {
 function renderStat() {
   const done = DATA.filter(x => marks[x.id] === "learned").length;
   $("#stat").innerHTML = `<b>${done}</b> / ${DATA.length} 已掌握`;
-  $("#subline").textContent = `${DATA.length} 个概念 · 从哪来 · 现在怎么用 · 还用不用`;
+  $("#subline").textContent = view.mode === "time"
+    ? "1986 — 2024 · 每年进来了什么"
+    : `${DATA.length} 个概念 · 从哪来 · 现在怎么用 · 还用不用`;
 }
 
 /* ── 列表 ── */
@@ -712,11 +798,14 @@ function match(x) {
   if (view.onlyTodo && marks[x.id] === "learned") return false;
   if (view.q) {
     const q = view.q.toLowerCase();
-    const hay = (x.zh + " " + x.en + " " + x.b + " " + x.n + " " + x.e).toLowerCase();
+    const hay = (x.zh + " " + x.en + " " + x.b + " " + x.n + " " + x.e + " " + x.y).toLowerCase();
     if (!hay.includes(q)) return false;
   }
   return true;
 }
+
+const yn = (x) => { const m = String(x.y || "").match(/\d{4}/); return m ? +m[0] : 0; };
+const isEst = (x) => String(x.y || "").charAt(0) === "~";
 
 function card(x) {
   const st = STATUS[x.s];
@@ -730,24 +819,82 @@ function card(x) {
     <div class="why">${esc(x.b)}</div>
     <div class="foot">
       <span class="badge b-${x.s}">${st.name}</span>
+      <span class="yr">${esc(String(x.y).replace("~", ""))}</span>
       ${m ? `<span class="mark ${m==="want"?"want":""}">· ${MARKS[m].n}</span>` : ""}
     </div>
   </button>`;
 }
 
-function render() {
-  const list = DATA.filter(match);
-  let html = "";
-  for (const d of DOMAINS) {
-    const sub = list.filter(x => x.d === d.id);
+/* ── 史书视图 ── */
+
+function yitem(x) {
+  const st = STATUS[x.s];
+  const m = marks[x.id];
+  return `<button class="yitem${m === "learned" ? " done" : ""}${isEst(x) ? " est" : ""}"
+    data-id="${x.id}" title="${esc(x.en)} · ${esc(DOMAINS.find(d => d.id === x.d).name)}">
+    <span class="nm">${esc(x.zh)}</span>
+    <span class="ys">${st.name}</span>
+    ${m ? `<span class="ym">${MARKS[m].n}</span>` : ""}
+  </button>`;
+}
+
+function renderTime(list) {
+  if (!list.length) return `<div class="empty">没有匹配的概念。换个关键词，或把筛选调回「全部」。</div>`;
+
+  let html = `<div class="tlead">
+    <p><b>按年份看同一批概念。</b>每条只记一个时间：它成形的那一年。状态颜色是今天的判断，不是当年的。</p>
+    <p class="fine">年份取首次公开发表、或首次成为通用做法的时间。带 ~ 的是估计——这类是工程实践，没有单一论文可依，只能定到年。</p>
+  </div>`;
+
+  for (const e of ERAS) {
+    const sub = list.filter(x => yn(x) >= e.a && yn(x) <= e.b);
     if (!sub.length) continue;
-    html += `<section id="sec-${d.id}">
-      <div class="sh"><h2>${d.name}</h2><span class="cnt">${sub.length}</span><p>${d.hint}</p></div>
-      <div class="grid">${sub.map(card).join("")}</div>
+    const years = [...new Set(sub.map(yn))].sort((a, b) => a - b);
+    html += `<section class="era">
+      <div class="erahd"><span class="eryr">${e.a === e.b ? e.a : e.a + " — " + e.b}</span><span class="ercnt">${sub.length} 条</span></div>
+      <h3>${esc(e.t)}</h3>
+      <p class="erp">${esc(e.p)}</p>` +
+      years.map(y => `<div class="yrow"><span class="yr">${y}</span><div class="yitems">` +
+        sub.filter(x => yn(x) === y).map(yitem).join("") + `</div></div>`).join("") +
+      `</section>`;
+  }
+
+  const miss = list.filter(x => !yn(x));
+  if (miss.length) {
+    html += `<section class="era">
+      <div class="erahd"><span class="eryr">未标年份</span><span class="ercnt">${miss.length} 条</span></div>
+      <div class="yrow"><span class="yr">?</span><div class="yitems">${miss.map(yitem).join("")}</div></div>
     </section>`;
   }
-  if (!list.length) html = `<div class="empty">没有匹配的概念。换个关键词，或把筛选调回「全部」。</div>`;
-  $("#app").innerHTML = html;
+
+  html += `<div class="tend"><b>2025—2026 没有新条目。</b>不是这两年没变化，是变化主要以产品迭代的形式出现，还没沉淀成稳定概念。也可能是这张表没跟上。</div>`;
+  return html;
+}
+
+function render() {
+  const list = DATA.filter(match);
+  const time = view.mode === "time";
+
+  document.body.dataset.mode = view.mode;
+  $("#modes").querySelectorAll("button")
+    .forEach(b => b.classList.toggle("on", b.dataset.mode === view.mode));
+
+  if (time) {
+    $("#app").innerHTML = renderTime(list);
+  } else {
+    let html = "";
+    for (const d of DOMAINS) {
+      const sub = list.filter(x => x.d === d.id);
+      if (!sub.length) continue;
+      html += `<section id="sec-${d.id}">
+        <div class="sh"><h2>${d.name}</h2><span class="cnt">${sub.length}</span><p>${d.hint}</p></div>
+        <div class="grid">${sub.map(card).join("")}</div>
+      </section>`;
+    }
+    if (!list.length) html = `<div class="empty">没有匹配的概念。换个关键词，或把筛选调回「全部」。</div>`;
+    $("#app").innerHTML = html;
+  }
+
   renderStat();
   renderChips();
   renderNav();
@@ -775,6 +922,7 @@ function openDetail(id) {
     <h3 id="mtitle">${esc(x.zh)} <span class="en">${esc(x.en)}</span></h3>
     <div class="meta">
       <span class="badge b-${x.s}">${st.name}</span>
+      ${x.y ? `<span class="v">${isEst(x) ? "约 " : ""}${esc(String(x.y).replace("~", ""))} 成形</span>` : ""}
       <span class="v">最后核对 ${esc(x.v)}</span>
     </div>
     <div class="row"><div class="k">前身 · 它替代了什么</div><div class="v">${esc(x.b)}</div></div>
@@ -816,6 +964,13 @@ document.addEventListener("click", (ev) => {
 
   if (t.dataset.syncclose) { closeSync(); return; }
   if (t.dataset.close) { closeDetail(); return; }
+  if (t.dataset.mode) {
+    view.mode = t.dataset.mode;
+    try { localStorage.setItem("ai-atlas-mode", view.mode); } catch (e) {}
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
   if (t.dataset.sync) { handleSync(t.dataset.sync); return; }
   if (t.dataset.id) { openDetail(t.dataset.id); return; }
   if (t.dataset.status) { view.status = t.dataset.status; render(); return; }
