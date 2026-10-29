@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="AI 系统地图：59 个概念的来路、现状与边界。每个概念回答四件事——它替代了什么、今天怎么用、还用不用、什么时候不该用。">
+<title>AI 系统地图 · Atlas</title>
+<style>
+:root{
+  --bg:#0b0f14; --panel:#111821; --panel2:#0f151d; --line:#1e2836;
+  --txt:#e6edf3; --dim:#8b98a5; --dim2:#5f6b78;
+  --acc:#ffd21e; --blue:#7dd3fc; --green:#34d399; --amber:#fbbf24;
+  --purple:#c084fc; --red:#fb7185; --slate:#94a3b8;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.65 var(--sans);
+  -webkit-font-smoothing:antialiased}
+body.lock{overflow:hidden}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(255,210,30,.25)}
+
+header{position:sticky;top:0;z-index:20;background:rgba(11,15,20,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  padding:14px 20px 12px}
+.bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#ffd21e,#f59e0b);
+  color:#1a1200;display:grid;place-items:center;font-size:19px;font-weight:800;flex:0 0 auto}
+h1{margin:0;font-size:17px;letter-spacing:.2px}
+.sub{margin:1px 0 0;font-size:11.5px;color:var(--dim)}
+.grow{flex:1}
+.stat{font:12px/1 var(--mono);color:var(--dim);border:1px solid var(--line);
+  border-radius:999px;padding:7px 11px;white-space:nowrap}
+.stat b{color:var(--acc);font-weight:600}
+
+.tools{max-width:1180px;margin:12px auto 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#q{flex:1 1 260px;min-width:180px;background:var(--panel);border:1px solid var(--line);
+  color:var(--txt);border-radius:9px;padding:9px 12px;font-size:13px;outline:none}
+#q:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(125,211,252,.12)}
+#q::placeholder{color:var(--dim2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--line);color:var(--dim);
+  border-radius:999px;padding:5px 10px;font-size:11.5px;line-height:1.4}
+.chip:hover{border-color:var(--dim2);color:var(--txt)}
+.chip.on{background:rgba(255,210,30,.13);border-color:rgba(255,210,30,.5);color:var(--acc)}
+.chip .n{font:10.5px var(--mono);opacity:.7;margin-left:3px}
+
+nav{max-width:1180px;margin:10px auto 0;display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}
+nav button{background:none;border:none;color:var(--dim);padding:6px 9px;font-size:12px;
+  border-bottom:2px solid transparent;white-space:nowrap}
+nav button:hover{color:var(--txt)}
+nav button.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+main{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+section{margin:0 0 26px}
+.sh{display:flex;align-items:baseline;gap:9px;margin:0 0 10px;padding-top:4px}
+.sh h2{margin:0;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--txt)}
+.sh .cnt{font:11px var(--mono);color:var(--dim2)}
+.sh p{margin:0;font-size:11.5px;color:var(--dim2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:9px}
+
+.card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:11px 12px 10px;color:var(--txt);position:relative;min-height:96px;
+  display:flex;flex-direction:column;gap:5px;transition:border-color .12s,transform .12s}
+.card:hover{border-color:#33445c;transform:translateY(-1px)}
+.card .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card .nm{font-size:13.5px;font-weight:600}
+.card .en{font:10.5px var(--mono);color:var(--dim2)}
+.card .why{font-size:11.5px;color:var(--dim);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .foot{margin-top:auto;display:flex;align-items:center;gap:6px}
+.card .mark{font-size:10.5px;color:var(--green)}
+.card .mark.want{color:var(--blue)}
+.dot{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.badge{font:10px/1 var(--mono);border:1px solid currentColor;border-radius:4px;
+  padding:2px 5px;opacity:.9;white-space:nowrap}
+.b-standard{color:var(--green)} .b-mainstream{color:var(--blue)}
+.b-transition{color:var(--amber)} .b-declining{color:var(--slate)}
+.b-legacy{color:#64748b} .b-contested{color:var(--purple)}
+
+.empty{color:var(--dim2);font-size:12.5px;padding:30px 0;text-align:center}
+
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:18px;
+  background:rgba(3,6,10,.72);backdrop-filter:blur(4px)}
+.modal[hidden]{display:none}
+.box{width:min(720px,100%);max-height:86vh;overflow:auto;background:var(--panel);
+  border:1px solid #243044;border-radius:14px;padding:22px 24px 18px;position:relative}
+.box .x{position:absolute;right:12px;top:10px;background:none;border:none;color:var(--dim2);
+  font-size:20px;line-height:1;padding:4px 8px}
+.box .x:hover{color:var(--txt)}
+.box .dom{font:10.5px var(--mono);color:var(--dim2);letter-spacing:.5px;text-transform:uppercase}
+.box h3{margin:4px 0 2px;font-size:20px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.box h3 .en{font:12px var(--mono);color:var(--dim2);font-weight:400}
+.box .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 16px}
+.box .meta .v{font:10.5px var(--mono);color:var(--dim2)}
+.row{border-top:1px solid var(--line);padding:12px 0}
+.row:first-of-type{border-top:none;padding-top:0}
+.row .k{font:10.5px var(--mono);color:var(--dim2);letter-spacing:.6px;margin-bottom:4px}
+.row .v{font-size:14px;line-height:1.7}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.links a{font-size:13px}
+.links a span{color:var(--dim2);font-size:11px;margin-left:6px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.acts button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+  border-radius:8px;padding:7px 12px;font-size:12px}
+.acts button:hover{color:var(--txt);border-color:var(--dim2)}
+.acts button.on{border-color:var(--green);color:var(--green);background:rgba(52,211,153,.1)}
+.acts button.on.want{border-color:var(--blue);color:var(--blue);background:rgba(125,211,252,.1)}
+.acts .sp{flex:1}
+
+footer{max-width:1180px;margin:0 auto;padding:0 20px 50px;color:var(--dim2);font-size:11.5px}
+footer .line{border-top:1px solid var(--line);padding-top:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+footer button{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;
+  padding:5px 10px;font-size:11.5px}
+footer button:hover{color:var(--txt);border-color:var(--dim2)}
+footer .note{flex:1 1 320px;line-height:1.6}
+
+/* ── 依赖图 ── */
+.dagwrap{max-width:1180px;margin:0 auto;padding:16px 20px 0}
+.daghead{display:flex;align-items:center;gap:10px;margin:0 0 9px}
+.daghead h2{margin:0;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--dim)}
+.daghead .cnt{font:11px var(--mono);color:var(--dim2)}
+.daghead button{margin-left:auto;background:none;border:1px solid var(--line);color:var(--dim2);
+  border-radius:7px;padding:4px 9px;font-size:11px}
+.daghead button:hover{color:var(--txt);border-color:var(--dim2)}
+.dag{border:1px solid var(--line);border-radius:11px;background:var(--panel2);padding:13px 16px 11px}
+.dag[hidden]{display:none}
+.dagrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.daglv{font:10px var(--mono);color:var(--dim2);min-width:26px;letter-spacing:.5px}
+.dagnode{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:5px 10px;color:var(--txt);font-size:12.5px;line-height:1.4}
+.dagnode:hover{border-color:#3b4d63}
+.dagnode .c{font:10px var(--mono);color:var(--dim2)}
+.dagnode.cross{border-style:dashed;color:var(--dim)}
+.dagarrow{display:flex;align-items:center;gap:9px;margin:6px 0 6px 35px;font-size:11px;color:var(--dim2)}
+.dagarrow .v{width:1px;height:13px;background:#2b3a4d;position:relative;flex:0 0 auto}
+.dagarrow .v::after{content:"";position:absolute;left:-2.5px;bottom:-1px;border:3px solid transparent;
+  border-top-color:#2b3a4d}
+.dagarrow .why{line-height:1.3}
+
+/* ── 同步 ── */
+#syncModal .box{width:min(560px,100%)}
+.sstatus{font:11.5px var(--mono);color:var(--dim);border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;margin:0 0 12px;line-height:1.5;word-break:break-all}
+.sstatus b{color:var(--acc);font-weight:600}
+.sstatus.bad{border-color:rgba(251,113,133,.5);color:var(--red)}
+.srow{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.srow input{flex:1 1 200px;min-width:150px;background:var(--panel2);border:1px solid var(--line);
+  color:var(--txt);border-radius:8px;padding:8px 10px;font-size:12.5px;outline:none}
+.srow input:focus{border-color:var(--blue)}
+.sbtn{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:8px;
+  padding:8px 12px;font-size:12px;white-space:nowrap}
+.sbtn:hover{color:var(--txt);border-color:var(--dim2)}
+.sbtn.primary{border-color:rgba(255,210,30,.45);color:var(--acc)}
+.sbtn:disabled{opacity:.5;cursor:default}
+.slog{font:11px var(--mono);color:var(--dim2);margin-top:10px;line-height:1.7;
+  max-height:88px;overflow:auto}
+.shelp{font-size:11.5px;color:var(--dim2);line-height:1.75;margin-top:12px;
+  border-top:1px solid var(--line);padding-top:11px}
+.shelp code{font:11px var(--mono);color:var(--acc)}
+footer #btnSync{color:var(--acc);border-color:rgba(255,210,30,.35)}
+footer #btnSync.ok{color:var(--green);border-color:rgba(52,211,153,.4)}
+footer #btnSync.err{color:var(--red);border-color:rgba(251,113,133,.45)}
+
+@media (max-width:560px){
+  .dagwrap{padding:12px 14px 0}
+  .dag{padding:11px 12px 9px}
+  .dagarrow{margin-left:0}
+  header{padding:12px 14px 10px}
+  .tools{padding:0}
+  main{padding:14px 14px 50px}
+  .grid{grid-template-columns:1fr}
+  .stat{display:none}
+  .box{padding:18px 16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="logo">◈</div>
+    <div>
+      <h1>AI 系统地图</h1>
+      <p class="sub" id="subline">从哪来 · 现在怎么用 · 还用不用</p>
+    </div>
+    <div class="grow"></div>
+    <div class="stat" id="stat">0 / 0</div>
+  </div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="搜索概念、术语…（按 / 聚焦）" autocomplete="off">
+    <div class="chips" id="statusChips"></div>
+  </div>
+  <nav id="domainNav"></nav>
+</header>
+
+<div class="dagwrap">
+  <div class="daghead">
+    <h2>依赖图</h2>
+    <span class="cnt">6 层 · 上依赖下</span>
+    <button id="btnDag">收起</button>
+  </div>
+  <div class="dag" id="dag"></div>
+</div>
+
+<main id="app"></main>
+
+<footer>
+  <div class="line">
+    <div class="note">状态是判断，不是事实。每条标了最后核对月份。链接指向原文，内容以原文为准。</div>
+    <button id="btnSync">同步</button>
+    <button id="btnExport">导出进度</button>
+    <button id="btnImport">导入</button>
+    <button id="btnReset">清空</button>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="box" id="box" role="dialog" aria-modal="true" aria-labelledby="mtitle"></div>
+</div>
+
+<div class="modal" id="syncModal" hidden>
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="stitle">
+    <button class="x" data-syncclose="1" aria-label="关闭">×</button>
+    <div class="dom">SYNC · 私有 Gist</div>
+    <h3 id="stitle" style="margin:4px 0 12px;font-size:19px">跨设备同步</h3>
+    <div class="sstatus" id="syncStatus">未配置。token 只存在这台电脑的浏览器里。</div>
+    <div class="srow">
+      <input id="tokenIn" type="password" placeholder="GitHub token（classic，只勾 gist）" autocomplete="off">
+      <button class="sbtn" data-sync="savetoken">保存 token</button>
+      <button class="sbtn" data-sync="cleartoken">清除</button>
+    </div>
+    <div class="srow">
+      <input id="gistIn" type="text" placeholder="Gist ID（第一次点右边创建）" autocomplete="off" spellcheck="false">
+      <button class="sbtn" data-sync="savegist">保存 ID</button>
+      <button class="sbtn primary" data-sync="create">创建新存档</button>
+    </div>
+    <div class="srow">
+      <button class="sbtn primary" data-sync="now" style="flex:1">立即双向同步</button>
+    </div>
+    <div class="slog" id="syncLog"></div>
+    <div class="shelp">
+      <b style="color:var(--txt)">三步：</b>① GitHub → Settings → Developer settings → Personal access tokens →
+      <b>Tokens (classic)</b> → 只勾 <code>gist</code>。② 粘 token → 点「创建新存档」拿到 Gist ID。
+      ③ 另一台电脑打开同一网址，粘同一个 token + Gist ID，点「立即双向同步」。<br>
+      合并规则：每个概念按各自的修改时间取新，冲突不动数据。token 建议 90 天过期，公用电脑用完点「清除」。
+    </div>
+  </div>
+</div>
+<input id="fileIn" type="file" accept=".json,application/json" hidden>
+
+<script>
+"use strict";
+
+/* ═══════════════ 数据 ═══════════════ */
+
+const DOMAINS = [
+  { id:"basics",      name:"基础",       hint:"需要多少系统知识才够" },
+  { id:"model",       name:"模型",       hint:"为什么是 Transformer" },
+  { id:"training",    name:"训练",       hint:"怎么让模型学会一件事" },
+  { id:"inference",   name:"推理",       hint:"为什么同样模型快慢差十倍" },
+  { id:"retrieval",   name:"检索 / RAG", hint:"模型不知道的东西怎么给它" },
+  { id:"agent",       name:"Agent",      hint:"怎么让模型做事而不只是说话" },
+  { id:"eval",        name:"评估",       hint:"怎么知道它真的变好了" },
+  { id:"engineering", name:"工程",       hint:"怎么让它稳定、便宜、可观测" },
+  { id:"boundary",    name:"边界",       hint:"能不能用、该不该用" }
+];
+
+const STATUS = {
+  standard:   { name:"标准", color:"var(--green)" },
+  mainstream: { name:"主流", color:"var(--blue)" },
+  transition: { name:"过渡", color:"var(--amber)" },
+  declining:  { name:"衰退", color:"var(--slate)" },
+  legacy:     { name:"历史", color:"#64748b" },
+  contested:  { name:"争议", color:"var(--purple)" }
+};
+
+const DATA = [
+/* ── 基础 ── */
+{ id:"backprop", zh:"反向传播", en:"Backpropagation", d:"basics", s:"standard", v:"2026-10",
+  b:"手推梯度不现实，网络一深就算不动",
+  n:"框架自动微分，你只定义前向；调试时仍要看梯度",
+  e:"几乎无替代；梯度消失要靠归一化和残差",
+  l:[["CS231n：反向传播","https://cs231n.github.io/optimization-2/"]] },
+{ id:"adamw", zh:"AdamW", en:"Adam with decoupled weight decay", d:"basics", s:"standard", v:"2026-10",
+  b:"SGD 对学习率太敏感，调参成本高",
+  n:"默认优化器；AdamW 把权重衰减和梯度解耦",
+  e:"超大 batch 偶用 LAMB / Adafactor；收敛异常先查 lr",
+  l:[["论文：Decoupled Weight Decay","https://arxiv.org/abs/1711.05101"],["PyTorch AdamW","https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html"]] },
+{ id:"amp", zh:"混合精度", en:"Mixed precision", d:"basics", s:"standard", v:"2026-10",
+  b:"fp32 又慢又吃显存",
+  n:"bf16 默认；fp16 需要 loss scaling",
+  e:"新卡上用 fp8；老卡 fp16 容易溢出",
+  l:[["论文：Mixed Precision Training","https://arxiv.org/abs/1710.03740"],["PyTorch AMP","https://pytorch.org/docs/stable/amp.html"]] },
+{ id:"bandwidth", zh:"显存带宽", en:"Memory bandwidth", d:"basics", s:"standard", v:"2026-10",
+  b:"算力涨了，数据却搬不动",
+  n:"推理优化先看内存带宽，不只看 FLOPs",
+  e:"计算密集的训练才以算力为主",
+  l:[["FlashAttention（IO 视角）","https://arxiv.org/abs/2205.14135"],["Making Deep Learning Go Brrrr","https://horace.io/brrr_intro.html"]] },
+{ id:"scaling", zh:"Scaling law", en:"Scaling laws", d:"basics", s:"mainstream", v:"2026-10",
+  b:"不知道该投多少算力和数据",
+  n:"预估 loss；Chinchilla 之后又被过量训练修正",
+  e:"数据质量和推理算力改变了曲线，不能直接外推",
+  l:[["Kaplan et al. 2020","https://arxiv.org/abs/2001.08361"],["Chinchilla","https://arxiv.org/abs/2203.15556"]] },
+{ id:"distributed", zh:"分布式训练", en:"DDP / ZeRO / FSDP", d:"basics", s:"standard", v:"2026-10",
+  b:"单卡装不下模型",
+  n:"切参数、梯度、优化器状态，多卡协同",
+  e:"小模型单卡更快；通信瓶颈时切分反而更慢",
+  l:[["ZeRO","https://arxiv.org/abs/1910.02054"],["PyTorch FSDP","https://pytorch.org/docs/stable/fsdp.html"]] },
+{ id:"checkpointing", zh:"梯度检查点", en:"Gradient checkpointing", d:"basics", s:"standard", v:"2026-10",
+  b:"激活值吃显存，大模型训不动",
+  n:"前向不存激活，反向重算，用算力换显存",
+  e:"会慢 20–30%，显存够就别开",
+  l:[["论文：Memory-Efficient Backprop","https://arxiv.org/abs/1604.06174"],["PyTorch checkpoint","https://pytorch.org/docs/stable/checkpoint.html"]] },
+
+/* ── 模型 ── */
+{ id:"rnn", zh:"RNN / LSTM", en:"Recurrent networks", d:"model", s:"legacy", v:"2026-10",
+  b:"序列模型只能一个词一个词递归地算",
+  n:"NLP 主干已不用；只在极短序列、边缘设备偶见",
+  e:"不能并行、长依赖衰减；新项目一律从 Transformer 起步",
+  l:[["Colah：理解 LSTM","https://colah.github.io/posts/2015-08-Understanding-LSTMs/"],["Seq2Seq","https://arxiv.org/abs/1409.3215"]] },
+{ id:"transformer", zh:"Transformer", en:"Transformer", d:"model", s:"standard", v:"2026-10",
+  b:"RNN 不能并行、长依赖弱",
+  n:"所有主流 LLM 的骨架",
+  e:"状态空间模型在超长序列有优势，但生态小",
+  l:[["Attention Is All You Need","https://arxiv.org/abs/1706.03762"],["The Illustrated Transformer","https://jalammar.github.io/illustrated-transformer/"]] },
+{ id:"attention", zh:"注意力变体", en:"MHA / MQA / GQA", d:"model", s:"standard", v:"2026-10",
+  b:"多头注意力表达力强，但 KV 太贵",
+  n:"GQA 成为默认；MQA 更省但质量降",
+  e:"MLA 是另一条路，框架支持少",
+  l:[["GQA","https://arxiv.org/abs/2305.13245"],["MQA","https://arxiv.org/abs/1911.02150"]] },
+{ id:"rope", zh:"旋转位置编码", en:"RoPE", d:"model", s:"standard", v:"2026-10",
+  b:"绝对位置编码外推能力差",
+  n:"旋转位置编码；长上下文靠 YaRN / NTK 插值",
+  e:"外推不是免费的，超过训练长度仍会退化",
+  l:[["RoFormer","https://arxiv.org/abs/2104.09864"],["YaRN","https://arxiv.org/abs/2309.00071"]] },
+{ id:"tokenizer", zh:"分词器", en:"BPE / WordPiece / Unigram", d:"model", s:"standard", v:"2026-10",
+  b:"词表外词（OOV）频发",
+  n:"byte-level BPE 主流；中文仍占多个 token",
+  e:"tokenizer-free 还在研究；换 tokenizer 等于重训",
+  l:[["BPE 原论文","https://arxiv.org/abs/1508.07909"],["tiktoken（byte-level BPE）","https://github.com/openai/tiktoken"]] },
+{ id:"word2vec", zh:"词向量", en:"Word2Vec", d:"model", s:"legacy", v:"2026-10",
+  b:"one-hot 词表又大又不带语义",
+  n:"被上下文相关的 embedding 取代；只在极轻量检索里还见得到",
+  e:"一词一向量，分不清多义词；别拿它做新系统的语义层",
+  l:[["Word2Vec 论文","https://arxiv.org/abs/1301.3781"],["BERT（上下文表示）","https://arxiv.org/abs/1810.04805"]] },
+{ id:"moe", zh:"混合专家", en:"Mixture of Experts", d:"model", s:"mainstream", v:"2026-10",
+  b:"想加参数，但不想等比例加算力",
+  n:"稀疏激活：总参数大、激活参数小",
+  e:"部署复杂，显存按总参数算",
+  l:[["DeepSeekMoE","https://arxiv.org/abs/2401.06066"],["Switch Transformer","https://arxiv.org/abs/2101.03961"]] },
+{ id:"multimodal", zh:"多模态融合", en:"Vision-language fusion", d:"model", s:"mainstream", v:"2026-10",
+  b:"图文各自为政，模型看不见图",
+  n:"视觉编码器 + projector；原生统一架构在增加",
+  e:"拼接式多模态在细粒度任务上仍弱",
+  l:[["CLIP","https://arxiv.org/abs/2103.00020"],["LLaVA","https://arxiv.org/abs/2304.08485"]] },
+
+/* ── 训练 ── */
+{ id:"pretrain", zh:"预训练", en:"Pre-training", d:"training", s:"standard", v:"2026-10",
+  b:"从零获得语言能力，没有捷径",
+  n:"千卡级，少数团队做；多数人做继续预训练",
+  e:"没有数据工程能力不要碰",
+  l:[["GPT-3","https://arxiv.org/abs/2005.14165"],["LLaMA","https://arxiv.org/abs/2302.13971"]] },
+{ id:"sft", zh:"监督微调", en:"Supervised Fine-Tuning", d:"training", s:"standard", v:"2026-10",
+  b:"基座模型不会听指令",
+  n:"几万条高质量对话即可见效",
+  e:"数据质量 > 数量；格式错等于白训",
+  l:[["InstructGPT","https://arxiv.org/abs/2203.02155"],["Hugging Face TRL（SFT 实现）","https://github.com/huggingface/trl"]] },
+{ id:"rlhf", zh:"RLHF / PPO", en:"RLHF with PPO", d:"training", s:"transition", v:"2026-10",
+  b:"人类偏好很难写成损失函数",
+  n:"奖励模型 + PPO，工程复杂、不稳定",
+  e:"多数场景已被 DPO / GRPO 替代，只有大团队还在跑 PPO",
+  l:[["Christiano et al. 2017","https://arxiv.org/abs/1706.03741"],["InstructGPT","https://arxiv.org/abs/2203.02155"]] },
+{ id:"dpo", zh:"直接偏好优化", en:"DPO", d:"training", s:"mainstream", v:"2026-10",
+  b:"PPO 太重、不稳定，还要单独训奖励模型",
+  n:"偏好对直接优化，不需要奖励模型",
+  e:"推理任务让位 GRPO；偏好对质量差会更差",
+  l:[["DPO 论文","https://arxiv.org/abs/2305.18290"],["DPO 参考实现","https://github.com/eric-mitchell/direct-preference-optimization"]] },
+{ id:"grpo", zh:"组相对策略优化", en:"GRPO", d:"training", s:"mainstream", v:"2026-10",
+  b:"PPO 的 critic 太贵，显存翻倍",
+  n:"组内相对优势，适合可验证奖励",
+  e:"通用对话仍多用 DPO；奖励设计不好会刷分",
+  l:[["DeepSeekMath","https://arxiv.org/abs/2402.03300"],["verl（GRPO 训练框架）","https://github.com/verl-project/verl"]] },
+{ id:"lora", zh:"低秩适配", en:"LoRA", d:"training", s:"standard", v:"2026-10",
+  b:"全量微调太贵，每个任务存一份权重",
+  n:"低秩 adapter，可训练参数 <1%",
+  e:"rank 不是越大越好；数据少时先加数据",
+  l:[["LoRA 论文","https://arxiv.org/abs/2106.09685"],["Hugging Face PEFT","https://github.com/huggingface/peft"]] },
+{ id:"qlora", zh:"4bit 微调", en:"QLoRA", d:"training", s:"standard", v:"2026-10",
+  b:"单卡显存不够，7B 都跑不起来",
+  n:"4bit 底座 + LoRA，显存换精度",
+  e:"8GB 跑 7B 是极限；多卡仍用 bf16",
+  l:[["QLoRA 论文","https://arxiv.org/abs/2305.14314"],["bitsandbytes（4bit 后端）","https://github.com/bitsandbytes-foundation/bitsandbytes"]] },
+{ id:"data", zh:"数据清洗与配比", en:"Data curation", d:"training", s:"standard", v:"2026-10",
+  b:"堆数据边际收益递减",
+  n:"去重、质量分类、配比实验",
+  e:"没有替代，且是真正的护城河",
+  l:[["去重论文","https://arxiv.org/abs/2107.06499"],["FineWeb 数据集论文","https://arxiv.org/abs/2406.17557"]] },
+{ id:"distill", zh:"蒸馏", en:"Distillation", d:"training", s:"mainstream", v:"2026-10",
+  b:"大模型推理太贵，小模型又不够聪明",
+  n:"用大模型输出训小模型",
+  e:"教师错误会被学生学走；合成数据要过滤",
+  l:[["Hinton 2015","https://arxiv.org/abs/1503.02531"],["MiniLLM","https://arxiv.org/abs/2306.08543"]] },
+
+/* ── 推理 ── */
+{ id:"kvcache", zh:"KV 缓存", en:"KV cache", d:"inference", s:"standard", v:"2026-10",
+  b:"每生成一个 token 都要重算整个历史",
+  n:"缓存 K/V，用显存换速度",
+  e:"长上下文显存吃紧，才有 GQA / 量化 KV",
+  l:[["PagedAttention","https://arxiv.org/abs/2309.06180"],["Databricks：推理性能工程","https://www.databricks.com/blog/llm-inference-performance-engineering-best-practices"]] },
+{ id:"paged", zh:"分页注意力", en:"PagedAttention", d:"inference", s:"standard", v:"2026-10",
+  b:"KV 碎片浪费大量显存",
+  n:"分页分配，vLLM 的核心",
+  e:"调度层仍在优化，但范式没变",
+  l:[["PagedAttention","https://arxiv.org/abs/2309.06180"],["vLLM 文档","https://docs.vllm.ai"]] },
+{ id:"staticbatch", zh:"静态批处理", en:"Static batching", d:"inference", s:"legacy", v:"2026-10",
+  b:"离线推理按固定 batch 跑，吞吐靠堆 batch size",
+  n:"只在纯离线批量任务里用；在线服务已全面换成连续批处理",
+  e:"按最长请求对齐，短请求白等；在线服务用它会浪费显存和时间",
+  l:[["Anyscale：连续批处理","https://www.anyscale.com/blog/continuous-batching-llm-inference"],["Orca（OSDI'22）","https://www.usenix.org/conference/osdi22/presentation/yu"]] },
+{ id:"batching", zh:"连续批处理", en:"Continuous batching", d:"inference", s:"standard", v:"2026-10",
+  b:"静态 batch 被最慢的请求拖住",
+  n:"请求级调度，完成即换下一个",
+  e:"单请求低延迟场景收益小",
+  l:[["Orca（OSDI'22）","https://www.usenix.org/conference/osdi22/presentation/yu"],["vLLM 文档","https://docs.vllm.ai"]] },
+{ id:"quant", zh:"量化", en:"Quantization", d:"inference", s:"standard", v:"2026-10",
+  b:"显存和带宽是瓶颈",
+  n:"GGUF 本地 / AWQ·GPTQ GPU / FP8 新卡",
+  e:"没有单一赢家，按硬件选格式",
+  l:[["GPTQ","https://arxiv.org/abs/2210.17323"],["AWQ","https://arxiv.org/abs/2306.00978"]] },
+{ id:"spec", zh:"投机解码", en:"Speculative decoding", d:"inference", s:"mainstream", v:"2026-10",
+  b:"大模型逐 token 生成太慢",
+  n:"小模型起草 + 大模型验证",
+  e:"草稿质量差时反而更慢",
+  l:[["Leviathan et al.","https://arxiv.org/abs/2211.17192"],["Chen et al.","https://arxiv.org/abs/2302.01318"]] },
+{ id:"prefix", zh:"前缀缓存", en:"Prompt caching", d:"inference", s:"mainstream", v:"2026-10",
+  b:"相同 system prompt 每次都要重算",
+  n:"API 层缓存 KV，命中后直接跳过",
+  e:"跨请求缓存有隐私边界",
+  l:[["vLLM 前缀缓存","https://docs.vllm.ai/en/latest/features/automatic_prefix_caching.html"],["论文：Prompt Cache","https://arxiv.org/abs/2311.04934"]] },
+{ id:"engines", zh:"推理引擎", en:"Inference engines", d:"inference", s:"contested", v:"2026-10",
+  b:"不同框架吞吐差十倍",
+  n:"vLLM / SGLang / TensorRT-LLM / llama.cpp",
+  e:"按硬件、并发、模型支持度选，没有统一答案",
+  l:[["vLLM","https://docs.vllm.ai"],["SGLang","https://github.com/sgl-project/sglang"]] },
+
+/* ── 检索 ── */
+{ id:"embedding", zh:"向量表示", en:"Embeddings", d:"retrieval", s:"standard", v:"2026-10",
+  b:"关键词匹配不懂语义",
+  n:"向量检索；中文常用 BGE / GTE / Qwen-Embedding",
+  e:"领域词和长文本仍要微调；稀疏 + 稠密混合常见",
+  l:[["Sentence-BERT","https://arxiv.org/abs/1908.10084"],["BGE","https://arxiv.org/abs/2309.07597"]] },
+{ id:"vectorindex", zh:"向量索引", en:"HNSW / IVF", d:"retrieval", s:"standard", v:"2026-10",
+  b:"全量比对太慢",
+  n:"近似最近邻检索",
+  e:"小数据直接暴力算更快；召回率和内存要权衡",
+  l:[["HNSW 论文","https://arxiv.org/abs/1603.09320"],["hnswlib","https://github.com/nmslib/hnswlib"]] },
+{ id:"chunking", zh:"分块", en:"Chunking", d:"retrieval", s:"mainstream", v:"2026-10",
+  b:"文档太长，塞不进上下文",
+  n:"按语义 / 结构切块，加 overlap",
+  e:"长上下文削弱它，但没有消除；切法决定上限",
+  l:[["Pinecone：Chunking","https://www.pinecone.io/learn/chunking-strategies/"],["Dense X Retrieval","https://arxiv.org/abs/2312.06648"]] },
+{ id:"rerank", zh:"重排", en:"Reranking", d:"retrieval", s:"mainstream", v:"2026-10",
+  b:"召回够但排序粗",
+  n:"cross-encoder 重排 top-k",
+  e:"成本敏感可省略，质量会降",
+  l:[["SBERT：Retrieve & Re-rank","https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html"],["ColBERT","https://arxiv.org/abs/2004.12832"]] },
+{ id:"rag", zh:"检索增强生成", en:"RAG", d:"retrieval", s:"standard", v:"2026-10",
+  b:"模型知识过期、容易幻觉",
+  n:"检索 → 拼上下文 → 生成",
+  e:"长上下文和微调是替代路线，不是替代品",
+  l:[["RAG 原论文","https://arxiv.org/abs/2005.11401"],["RAG 综述","https://arxiv.org/abs/2312.10997"]] },
+{ id:"rageval", zh:"RAG 评估", en:"RAG evaluation", d:"retrieval", s:"contested", v:"2026-10",
+  b:"不知道检索到底有没有用",
+  n:"召回率、faithfulness、答案相关性",
+  e:"仍靠人工抽检 + LLM judge，指标不统一",
+  l:[["RAGAS","https://arxiv.org/abs/2309.15217"],["Ragas 文档","https://docs.ragas.io"]] },
+
+/* ── Agent ── */
+{ id:"react", zh:"ReAct", en:"Reason + Act", d:"agent", s:"standard", v:"2026-10",
+  b:"模型只会答，不会查和做",
+  n:"思考 → 行动 → 观察 循环",
+  e:"工具多时容易绕圈；框架封装了它，但范式没变",
+  l:[["ReAct 论文","https://arxiv.org/abs/2210.03629"],["LangGraph","https://github.com/langchain-ai/langgraph"]] },
+{ id:"tooluse", zh:"函数调用", en:"Function calling", d:"agent", s:"standard", v:"2026-10",
+  b:"自由文本无法可靠调工具",
+  n:"JSON schema 约束输出",
+  e:"schema 太复杂会降低调用成功率",
+  l:[["OpenAI Cookbook：函数调用","https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb"],["ToolLLM","https://arxiv.org/abs/2307.16789"]] },
+{ id:"mcp", zh:"模型上下文协议", en:"MCP", d:"agent", s:"mainstream", v:"2026-10",
+  b:"每个工具一套接口，重复适配",
+  n:"统一工具 / 资源协议，一次接入多处复用",
+  e:"A2A 负责 agent 间通信；权限和注入是新风险",
+  l:[["MCP 官网","https://modelcontextprotocol.io"],["Anthropic 发布说明","https://www.anthropic.com/news/model-context-protocol"]] },
+{ id:"memory", zh:"智能体记忆", en:"Agent memory", d:"agent", s:"contested", v:"2026-10",
+  b:"上下文窗口有限，聊久了就忘",
+  n:"短期上下文 + 长期向量库 + 摘要",
+  e:"没有公认最佳实践，别过度设计",
+  l:[["MemGPT","https://arxiv.org/abs/2310.08560"],["Letta 文档","https://docs.letta.com"]] },
+{ id:"planning", zh:"规划", en:"CoT / ToT", d:"agent", s:"mainstream", v:"2026-10",
+  b:"多步任务一步错、步步错",
+  n:"CoT 提示；ToT 做搜索",
+  e:"推理模型内置思考，外显 CoT 的重要性下降",
+  l:[["Chain-of-Thought","https://arxiv.org/abs/2201.11903"],["Tree of Thoughts","https://arxiv.org/abs/2305.10601"]] },
+{ id:"multiagent", zh:"多智能体", en:"Multi-agent", d:"agent", s:"contested", v:"2026-10",
+  b:"单 agent 能力有上限",
+  n:"角色分工 + 消息传递",
+  e:"生产上「单 agent + 工具」往往更稳",
+  l:[["AutoGen","https://arxiv.org/abs/2308.08155"],["Don't Build Multi-Agents","https://cognition.com/blog/dont-build-multi-agents"]] },
+{ id:"computeruse", zh:"操作电脑", en:"Computer use", d:"agent", s:"contested", v:"2026-10",
+  b:"API 覆盖不到的操作只能人工",
+  n:"看屏幕、点鼠标、填表单",
+  e:"可靠性不足，先做辅助而不是替代",
+  l:[["OSWorld","https://arxiv.org/abs/2404.07972"],["Anthropic Computer use","https://www.anthropic.com/news/3-5-models-and-computer-use"]] },
+
+/* ── 评估 ── */
+{ id:"benchmark", zh:"基准测试", en:"Benchmarks", d:"eval", s:"standard", v:"2026-10",
+  b:"没有统一比较口径",
+  n:"MMLU / SWE-bench / τ-bench 等",
+  e:"污染严重，私有 eval 更重要",
+  l:[["MMLU","https://arxiv.org/abs/2009.03300"],["SWE-bench","https://arxiv.org/abs/2310.06770"]] },
+{ id:"judge", zh:"模型评判", en:"LLM-as-judge", d:"eval", s:"mainstream", v:"2026-10",
+  b:"人工评估太贵、太慢",
+  n:"用强模型打分",
+  e:"位置 / 长度偏见，必须校准",
+  l:[["Judging LLM-as-a-Judge","https://arxiv.org/abs/2306.05685"],["OpenAI Evals","https://github.com/openai/evals"]] },
+{ id:"arena", zh:"竞技场", en:"Arena / pairwise", d:"eval", s:"mainstream", v:"2026-10",
+  b:"绝对分数不可比",
+  n:"两两对比算 Elo",
+  e:"主观偏好 ≠ 任务能力",
+  l:[["Chatbot Arena","https://arxiv.org/abs/2403.04132"],["LMSYS（Arena 团队）","https://www.lmsys.org/"]] },
+{ id:"regression", zh:"回归测试", en:"Regression evals", d:"eval", s:"standard", v:"2026-10",
+  b:"改一句 prompt 就悄悄退化",
+  n:"固定 eval set + CI",
+  e:"多数团队做得不够",
+  l:[["HELM","https://arxiv.org/abs/2211.09110"],["lm-evaluation-harness","https://github.com/EleutherAI/lm-evaluation-harness"]] },
+{ id:"contamination", zh:"数据污染", en:"Benchmark contamination", d:"eval", s:"contested", v:"2026-10",
+  b:"分数虚高，无法判断真实能力",
+  n:"n-gram 重合、成员推断",
+  e:"没有完美方法",
+  l:[["数据污染调查","https://arxiv.org/abs/2311.09783"]] },
+
+/* ── 工程 ── */
+{ id:"promptops", zh:"Prompt 版本管理", en:"Prompt versioning", d:"engineering", s:"contested", v:"2026-10",
+  b:"prompt 散落在代码和文档里",
+  n:"模板 + 版本 + 灰度",
+  e:"部分被代码仓库顺带解决，工具仍在收敛",
+  l:[["promptfoo","https://promptfoo.dev"],["Langfuse","https://github.com/langfuse/langfuse"]] },
+{ id:"observability", zh:"可观测性", en:"Tracing", d:"engineering", s:"mainstream", v:"2026-10",
+  b:"Agent 是黑盒，出错无法定位",
+  n:"用 span 记录每一步工具调用",
+  e:"OpenTelemetry GenAI 约定仍在收敛",
+  l:[["OTel GenAI 约定","https://opentelemetry.io/docs/specs/semconv/gen-ai/"],["Langfuse 文档","https://langfuse.com/docs"]] },
+{ id:"cost", zh:"成本 / 延迟", en:"Cost & latency", d:"engineering", s:"standard", v:"2026-10",
+  b:"全部用大模型太贵、太慢",
+  n:"路由、缓存、小模型、批处理",
+  e:"路由判断错会伤质量",
+  l:[["RouteLLM","https://arxiv.org/abs/2406.18665"],["论文：FrugalGPT（成本级联）","https://arxiv.org/abs/2305.05176"]] },
+{ id:"injection", zh:"提示注入", en:"Prompt injection", d:"engineering", s:"contested", v:"2026-10",
+  b:"工具让模型能做事，也能被利用",
+  n:"输入隔离、权限最小化、人工确认",
+  e:"没有银弹",
+  l:[["Greshake et al.","https://arxiv.org/abs/2302.12173"],["OWASP LLM Top 10","https://owasp.org/projects/top-10-for-large-language-model-applications"]] },
+{ id:"deploy", zh:"部署形态", en:"Deployment", d:"engineering", s:"standard", v:"2026-10",
+  b:"自建、托管、API 各有取舍",
+  n:"API / Space / 专用实例 / 自建",
+  e:"按流量、合规、成本选",
+  l:[["vLLM（自建推理服务）","https://github.com/vllm-project/vllm"],["vLLM","https://docs.vllm.ai"]] },
+
+/* ── 边界 ── */
+{ id:"alignment", zh:"对齐", en:"Alignment", d:"boundary", s:"contested", v:"2026-10",
+  b:"能力越强，目标越要可靠",
+  n:"RLHF / DPO / Constitutional AI",
+  e:"没有定论",
+  l:[["InstructGPT","https://arxiv.org/abs/2203.02155"],["Constitutional AI","https://arxiv.org/abs/2212.08073"]] },
+{ id:"licensing", zh:"许可与开源定义", en:"Licensing", d:"boundary", s:"contested", v:"2026-10",
+  b:"open weights 常被当成 open source",
+  n:"看 LICENSE + 使用政策；OSAID 给判据",
+  e:"商用必须逐条读原文",
+  l:[["SPDX 许可证列表","https://spdx.org/licenses/"],["OSAID","https://opensource.org/ai/open-source-ai-definition"]] },
+{ id:"privacy", zh:"隐私与训练数据", en:"Privacy", d:"boundary", s:"mainstream", v:"2026-10",
+  b:"模型可能记住敏感信息",
+  n:"PII 过滤、脱敏、差分隐私",
+  e:"法规驱动，技术不完整",
+  l:[["Extracting Training Data","https://arxiv.org/abs/2012.07805"],["Differential Privacy","https://arxiv.org/abs/1607.00133"]] },
+{ id:"copyright", zh:"版权", en:"Copyright", d:"boundary", s:"contested", v:"2026-10",
+  b:"训练数据来源不清，输出归属不明",
+  n:"诉讼进行中，各法域规则不同",
+  e:"商用需要自评，不能只看模型许可",
+  l:[["WIPO：前沿技术知识产权","https://www.wipo.int/en/web/frontier-technologies"],["论文：Foundation Models and Fair Use","https://arxiv.org/abs/2303.15715"]] }
+];
+
+/* ═══════════════ 状态 ═══════════════ */
+
+const KEY = "ai-atlas-v1";
+const SKEY = "ai-atlas-sync";
+const MARKS = { want:{ n:"想学", c:"var(--blue)" }, seen:{ n:"看懂", c:"var(--amber)" }, learned:{ n:"已掌握", c:"var(--green)" } };
+
+let view = { q:"", status:"all", domain:"all", onlyTodo:false };
+let marks = {};          // id -> want | seen | learned
+let mts = {};            // id -> 修改时间戳，用于跨设备合并
+const CFG = { token:"", gistId:"", device:"", lastAt:0 };
+let syncBusy = false;
+
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) {
+    const j = JSON.parse(raw);
+    if (j && j.marks && typeof j.marks === "object") marks = j.marks;
+    if (j && j.mts && typeof j.mts === "object") mts = j.mts;
+  }
+} catch (e) {}
+
+try {
+  const raw = localStorage.getItem(SKEY);
+  if (raw) {
+    const j = JSON.parse(raw);
+    if (j) { CFG.token = j.token || ""; CFG.gistId = j.gistId || ""; CFG.device = j.device || ""; CFG.lastAt = j.lastAt || 0; }
+  }
+} catch (e) {}
+
+if (!CFG.device) {
+  CFG.device = Math.random().toString(36).slice(2, 8);
+  try { localStorage.setItem(SKEY, JSON.stringify(CFG)); } catch (e) {}
+}
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify({ v:2, marks, mts })); } catch (e) {}
+}
+function saveCfg() {
+  try { localStorage.setItem(SKEY, JSON.stringify(CFG)); } catch (e) {}
+}
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const byId = Object.fromEntries(DATA.map(x => [x.id, x]));
+
+/* ── 顶栏 ── */
+
+function counts() {
+  const c = { all: DATA.length };
+  for (const k of Object.keys(STATUS)) c[k] = DATA.filter(x => x.s === k).length;
+  return c;
+}
+
+function renderChips() {
+  const c = counts();
+  const items = [["all","全部",c.all], ...Object.entries(STATUS).map(([k,v]) => [k, v.name, c[k]])];
+  let html = items.map(([k,n,count]) =>
+    `<button class="chip ${view.status===k?"on":""}" data-status="${k}">${n}<span class="n">${count}</span></button>`
+  ).join("");
+  html += `<button class="chip ${view.onlyTodo?"on":""}" data-todo="1">未掌握<span class="n">${DATA.filter(x => marks[x.id] !== "learned").length}</span></button>`;
+  $("#statusChips").innerHTML = html;
+}
+
+function renderNav() {
+  const items = [["all","全部"], ...DOMAINS.map(d => [d.id, d.name])];
+  $("#domainNav").innerHTML = items.map(([id,n]) =>
+    `<button class="${view.domain===id?"on":""}" data-domain="${id}">${n}</button>`
+  ).join("");
+}
+
+/* ── 依赖图 ── */
+
+const DAG = [
+  { lv:"L0", why:"没有自动微分和并行切分，模型连训练都起不来", nodes:["basics"] },
+  { lv:"L1", why:"架构定了，才谈怎么喂数据", nodes:["model"] },
+  { lv:"L2", why:"权重训出来了，才谈怎么跑得快", nodes:["training"] },
+  { lv:"L3", why:"Agent 的每一步，本质都是一次推理调用", nodes:["inference","retrieval"] },
+  { lv:"L4", why:"上线前先能量化，再谈稳定和便宜", nodes:["agent","eval"] },
+  { lv:"L5", why:"边界横切所有层：能不能用、该不该用", nodes:["engineering","boundary"] }
+];
+
+function renderDag() {
+  const n = id => DATA.filter(x => x.d === id).length;
+  const nm = id => DOMAINS.find(d => d.id === id).name;
+  let html = "";
+  DAG.forEach((row, i) => {
+    if (i) html += `<div class="dagarrow"><span class="v"></span><span class="why">${row.why}</span></div>`;
+    html += `<div class="dagrow"><span class="daglv">${row.lv}</span>` +
+      row.nodes.map(id => {
+        const cross = id === "boundary";
+        return `<button class="dagnode${cross?" cross":""}" data-domain="${id}">${esc(nm(id))}<span class="c">${n(id)}</span></button>`;
+      }).join("") + `</div>`;
+  });
+  $("#dag").innerHTML = html;
+}
+
+function toggleDag(force) {
+  const el = $("#dag"), btn = $("#btnDag");
+  const hide = force === undefined ? !el.hidden : force;
+  el.hidden = hide;
+  btn.textContent = hide ? "展开" : "收起";
+  try { localStorage.setItem("ai-atlas-dag", hide ? "0" : "1"); } catch (e) {}
+}
+
+function renderStat() {
+  const done = DATA.filter(x => marks[x.id] === "learned").length;
+  $("#stat").innerHTML = `<b>${done}</b> / ${DATA.length} 已掌握`;
+  $("#subline").textContent = `${DATA.length} 个概念 · 从哪来 · 现在怎么用 · 还用不用`;
+}
+
+/* ── 列表 ── */
+
+function match(x) {
+  if (view.status !== "all" && x.s !== view.status) return false;
+  if (view.domain !== "all" && x.d !== view.domain) return false;
+  if (view.onlyTodo && marks[x.id] === "learned") return false;
+  if (view.q) {
+    const q = view.q.toLowerCase();
+    const hay = (x.zh + " " + x.en + " " + x.b + " " + x.n + " " + x.e).toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function card(x) {
+  const st = STATUS[x.s];
+  const m = marks[x.id];
+  return `<button class="card" data-id="${x.id}" aria-label="${esc(x.zh)}">
+    <div class="top">
+      <span class="dot" style="background:${st.color}"></span>
+      <span class="nm">${esc(x.zh)}</span>
+      <span class="en">${esc(x.en)}</span>
+    </div>
+    <div class="why">${esc(x.b)}</div>
+    <div class="foot">
+      <span class="badge b-${x.s}">${st.name}</span>
+      ${m ? `<span class="mark ${m==="want"?"want":""}">· ${MARKS[m].n}</span>` : ""}
+    </div>
+  </button>`;
+}
+
+function render() {
+  const list = DATA.filter(match);
+  let html = "";
+  for (const d of DOMAINS) {
+    const sub = list.filter(x => x.d === d.id);
+    if (!sub.length) continue;
+    html += `<section id="sec-${d.id}">
+      <div class="sh"><h2>${d.name}</h2><span class="cnt">${sub.length}</span><p>${d.hint}</p></div>
+      <div class="grid">${sub.map(card).join("")}</div>
+    </section>`;
+  }
+  if (!list.length) html = `<div class="empty">没有匹配的概念。换个关键词，或把筛选调回「全部」。</div>`;
+  $("#app").innerHTML = html;
+  renderStat();
+  renderChips();
+  renderNav();
+}
+
+/* ── 详情 ── */
+
+let openId = null;
+
+function openDetail(id) {
+  const x = byId[id];
+  if (!x) return;
+  openId = id;
+  const st = STATUS[x.s];
+  const m = marks[id];
+  const links = x.l.map(([label, url]) => {
+    let host = "";
+    try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) {}
+    return `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}<span>${esc(host)}</span></a>`;
+  }).join("");
+
+  $("#box").innerHTML = `
+    <button class="x" data-close="1" aria-label="关闭">×</button>
+    <div class="dom">${esc(DOMAINS.find(d => d.id === x.d).name)}</div>
+    <h3 id="mtitle">${esc(x.zh)} <span class="en">${esc(x.en)}</span></h3>
+    <div class="meta">
+      <span class="badge b-${x.s}">${st.name}</span>
+      <span class="v">最后核对 ${esc(x.v)}</span>
+    </div>
+    <div class="row"><div class="k">前身 · 它替代了什么</div><div class="v">${esc(x.b)}</div></div>
+    <div class="row"><div class="k">现在 · 实际怎么用</div><div class="v">${esc(x.n)}</div></div>
+    <div class="row"><div class="k">边界 · 什么时候不该用</div><div class="v">${esc(x.e)}</div></div>
+    <div class="row"><div class="k">深链</div><div class="links">${links}</div></div>
+    <div class="acts">
+      <button data-mark="want" class="${m==="want"?"on want":""}">想学</button>
+      <button data-mark="seen" class="${m==="seen"?"on":""}">看懂</button>
+      <button data-mark="learned" class="${m==="learned"?"on":""}">已掌握</button>
+      <span class="sp"></span>
+      <button data-clear="1">清除标记</button>
+    </div>`;
+  $("#modal").hidden = false;
+  document.body.classList.add("lock");
+  $("#modal").querySelector(".x").focus();
+}
+
+function closeDetail() {
+  $("#modal").hidden = true;
+  document.body.classList.remove("lock");
+  openId = null;
+}
+
+function setMark(id, m) {
+  if (!m || marks[id] === m) { delete marks[id]; mts[id] = Date.now(); }
+  else { marks[id] = m; mts[id] = Date.now(); }
+  save();
+  render();
+  if (openId === id) openDetail(id);
+  schedulePush();
+}
+
+/* ── 事件 ── */
+
+document.addEventListener("click", (ev) => {
+  const t = ev.target.closest("button, [data-close]");
+  if (!t) return;
+
+  if (t.dataset.syncclose) { closeSync(); return; }
+  if (t.dataset.close) { closeDetail(); return; }
+  if (t.dataset.sync) { handleSync(t.dataset.sync); return; }
+  if (t.dataset.id) { openDetail(t.dataset.id); return; }
+  if (t.dataset.status) { view.status = t.dataset.status; render(); return; }
+  if (t.dataset.domain) { view.domain = t.dataset.domain; render();
+    if (t.dataset.domain !== "all") document.getElementById("sec-" + t.dataset.domain)?.scrollIntoView({ block:"start", behavior:"smooth" });
+    return; }
+  if (t.dataset.todo) { view.onlyTodo = !view.onlyTodo; render(); return; }
+  if (t.dataset.mark) { setMark(openId, t.dataset.mark); return; }
+  if (t.dataset.clear) { setMark(openId, null); return; }
+});
+
+$("#modal").addEventListener("click", (ev) => { if (ev.target.id === "modal") closeDetail(); });
+$("#syncModal").addEventListener("click", (ev) => { if (ev.target.id === "syncModal") closeSync(); });
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") { closeDetail(); closeSync(); }
+  if (ev.key === "/" && document.activeElement.tagName !== "INPUT") {
+    ev.preventDefault(); $("#q").focus();
+  }
+});
+
+$("#q").addEventListener("input", (ev) => { view.q = ev.target.value.trim(); render(); });
+
+/* ── 导入导出 ── */
+
+$("#btnExport").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ app:"ai-atlas", v:2, exported:new Date().toISOString(), marks, mts }, null, 2)], { type:"application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ai-atlas-progress.json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+$("#btnImport").addEventListener("click", () => $("#fileIn").click());
+
+$("#fileIn").addEventListener("change", (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const j = JSON.parse(String(r.result));
+      if (!j || typeof j.marks !== "object") throw new Error("格式不对");
+      const now = Date.now();
+      for (const id of Object.keys(j.marks)) {
+        marks[id] = j.marks[id];
+        mts[id] = (j.mts && j.mts[id]) || now;
+      }
+      save(); render(); closeDetail();
+      alert("已导入 " + Object.keys(j.marks).length + " 条进度");
+      schedulePush();
+    } catch (e) { alert("导入失败：" + e.message); }
+  };
+  r.readAsText(f);
+  ev.target.value = "";
+});
+
+$("#btnReset").addEventListener("click", () => {
+  if (!confirm("确定清空所有进度标记？只影响本机浏览器和你的 Gist 存档。")) return;
+  const now = Date.now();
+  for (const id of Object.keys(marks)) { delete marks[id]; mts[id] = now; }
+  save(); render(); closeDetail(); schedulePush();
+});
+
+/* ── 跨设备同步：私有 Gist ── */
+
+const GH = "https://api.github.com";
+const GFILE = "ai-atlas-progress.json";
+const logs = [];
+let pushTimer = null;
+
+function logSync(msg, bad) {
+  logs.unshift({ t: new Date().toLocaleTimeString("zh-CN"), msg, bad: !!bad });
+  if (logs.length > 6) logs.pop();
+  renderSyncLog();
+}
+
+function payload() {
+  return { app:"ai-atlas", v:1, device:CFG.device, updatedAt:new Date().toISOString(), marks, mts };
+}
+
+async function gh(path, opts) {
+  opts = opts || {};
+  const h = {
+    "Authorization": "Bearer " + CFG.token,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+  if (opts.body) h["Content-Type"] = "application/json";
+  const r = await fetch(GH + path, { method: opts.method || "GET", headers: h, body: opts.body });
+  const txt = await r.text();
+  let j = null;
+  try { j = txt ? JSON.parse(txt) : null; } catch (e) {}
+  if (!r.ok) {
+    const e = new Error(((j && j.message) || ("HTTP " + r.status)) + " · " + r.status);
+    e.status = r.status;
+    throw e;
+  }
+  return j;
+}
+
+/* 每个概念按时间戳取新的一方；时间戳相同则保留本机 */
+function mergeRemote(remote) {
+  const rm = (remote && remote.marks) || {};
+  const rt = (remote && remote.mts) || {};
+  const ids = new Set([...Object.keys(marks), ...Object.keys(rm), ...Object.keys(mts), ...Object.keys(rt)]);
+  for (const id of ids) {
+    const lt = mts[id] || 0, rr = rt[id] || 0;
+    if (rr <= lt) continue;
+    if (id in rm) marks[id] = rm[id];
+    else delete marks[id];
+    mts[id] = rr;
+  }
+}
+
+function setSyncState(msg, bad) {
+  const el = $("#syncStatus");
+  if (!el) return;
+  let txt, cls = "";
+  if (msg) { txt = msg; cls = bad ? "bad" : ""; }
+  else if (!CFG.token) txt = "未配置。token 只存在这台电脑的浏览器里。";
+  else if (!CFG.gistId) txt = "已保存 token，还没有 Gist ID。点「创建新存档」。";
+  else txt = `已连接 · Gist <b>${esc(CFG.gistId.slice(0,10))}…</b> · 本机 ${esc(CFG.device)}` +
+              (CFG.lastAt ? ` · 上次同步 ${new Date(CFG.lastAt).toLocaleString("zh-CN", { hour12:false })}` : " · 还没同步过");
+  el.innerHTML = txt;
+  el.className = "sstatus " + cls;
+  const b = $("#btnSync");
+  if (b) {
+    b.className = bad ? "err" : (CFG.lastAt ? "ok" : "");
+    b.textContent = bad ? "同步失败" : (CFG.lastAt ? "已同步" : "同步");
+  }
+}
+
+function renderSyncLog() {
+  const el = $("#syncLog");
+  if (el) el.innerHTML = logs.length
+    ? logs.map(l => `<div style="color:${l.bad ? "var(--red)" : "var(--dim2)"}">${esc(l.t)} · ${esc(l.msg)}</div>`).join("")
+    : "";
+}
+
+function openSync() {
+  $("#syncModal").hidden = false;
+  document.body.classList.add("lock");
+  $("#gistIn").value = CFG.gistId || "";
+  $("#tokenIn").value = "";
+  $("#tokenIn").placeholder = CFG.token ? "token 已保存（粘贴新的可覆盖）" : "GitHub token（classic，只勾 gist）";
+  setSyncState();
+  renderSyncLog();
+  $("#tokenIn").focus();
+}
+
+function closeSync() {
+  $("#syncModal").hidden = true;
+  if ($("#modal").hidden) document.body.classList.remove("lock");
+}
+
+async function syncNow(o) {
+  o = o || {};
+  if (!CFG.token || !CFG.gistId) {
+    if (!o.silent) { logSync("先保存 token 和 Gist ID", true); setSyncState("缺少 token 或 Gist ID。", true); }
+    return;
+  }
+  if (syncBusy) return;
+  syncBusy = true;
+  if (!o.silent) setSyncState("同步中…");
+
+  try {
+    const g = await gh("/gists/" + CFG.gistId);
+    const f = g.files && g.files[GFILE];
+    let remote = null;
+    if (f && f.content) { try { remote = JSON.parse(f.content); } catch (e) {} }
+
+    if (!remote) {
+      await push();
+      logSync("云端为空，已上传本机进度");
+    } else {
+      const before = JSON.stringify([marks, mts]);
+      mergeRemote(remote);
+      save(); render();
+      const merged = JSON.stringify([marks, mts]);
+      const theirs = JSON.stringify([remote.marks || {}, remote.mts || {}]);
+      if (merged !== theirs) {
+        await push();
+        logSync(merged !== before ? "已合并差异并上传" : "已上传本机进度");
+      } else {
+        logSync("已是最新");
+      }
+    }
+    CFG.lastAt = Date.now(); saveCfg(); setSyncState();
+  } catch (e) {
+    logSync("失败：" + e.message, true);
+    setSyncState("同步失败：" + e.message, true);
+  } finally {
+    syncBusy = false;
+  }
+}
+
+async function push() {
+  await gh("/gists/" + CFG.gistId, {
+    method: "PATCH",
+    body: JSON.stringify({ files: { [GFILE]: { content: JSON.stringify(payload(), null, 1) } } })
+  });
+}
+
+async function createGist() {
+  if (!CFG.token) { logSync("先保存 token", true); setSyncState("还没有 token。", true); return; }
+  if (CFG.gistId && !confirm("现在已有一个 Gist ID，新建会另起一份存档。继续？")) return;
+  syncBusy = true;
+  setSyncState("创建中…");
+  try {
+    const j = await gh("/gists", {
+      method: "POST",
+      body: JSON.stringify({
+        description: "AI Atlas · 进度存档（私有）",
+        public: false,
+        files: { [GFILE]: { content: JSON.stringify(payload(), null, 1) } }
+      })
+    });
+    CFG.gistId = j.id; CFG.lastAt = Date.now(); saveCfg();
+    $("#gistIn").value = j.id;
+    logSync("已创建存档 " + j.id);
+    setSyncState();
+  } catch (e) {
+    logSync("创建失败：" + e.message, true);
+    setSyncState("创建失败：" + e.message, true);
+  } finally { syncBusy = false; }
+}
+
+function schedulePush() {
+  if (!CFG.token || !CFG.gistId) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => syncNow({ silent: true }), 2500);
+}
+
+function handleSync(act) {
+  if (act === "savetoken") {
+    const v = $("#tokenIn").value.trim();
+    if (!v) { logSync("token 是空的", true); return; }
+    CFG.token = v; saveCfg();
+    $("#tokenIn").value = ""; $("#tokenIn").placeholder = "token 已保存（粘贴新的可覆盖）";
+    logSync("token 已保存到本机");
+    setSyncState();
+    if (CFG.gistId) syncNow();
+    return;
+  }
+  if (act === "cleartoken") {
+    CFG.token = ""; saveCfg();
+    logSync("token 已清除");
+    setSyncState();
+    return;
+  }
+  if (act === "savegist") {
+    const v = $("#gistIn").value.trim();
+    if (!v) { logSync("Gist ID 是空的", true); return; }
+    CFG.gistId = v; saveCfg();
+    logSync("Gist ID 已保存");
+    setSyncState();
+    if (CFG.token) syncNow();
+    return;
+  }
+  if (act === "create") { createGist(); return; }
+  if (act === "now") { syncNow(); return; }
+}
+
+$("#btnSync").addEventListener("click", openSync);
+$("#btnDag").addEventListener("click", () => toggleDag());
+
+/* ── 启动 ── */
+
+renderDag();
+render();
+toggleDag(localStorage.getItem("ai-atlas-dag") === "0");
+setSyncState();
+if (CFG.token && CFG.gistId) syncNow({ silent: true });
+</script>
+</body>
+</html>
